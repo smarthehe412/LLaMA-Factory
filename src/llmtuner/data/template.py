@@ -343,7 +343,7 @@ def get_template_and_fix_tokenizer(
     name: Optional[str] = None,
 ) -> Template:
     if name is None:
-        template = templates["vanilla"]  # placeholder
+        template = templates["empty"]  # placeholder
     else:
         template = templates.get(name, None)
         if template is None:
@@ -385,7 +385,8 @@ _register_template(
     format_user=StringFormatter(slots=["### Instruction:\n{{content}}\n\n### Response:\n"]),
     format_separator=EmptyFormatter(slots=["\n\n"]),
     default_system=(
-        "Below is an instruction that describes a task. " "Write a response that appropriately completes the request."
+        "Below is an instruction that describes a task. "
+        "Write a response that appropriately completes the request.\n\n"
     ),
 )
 
@@ -550,6 +551,31 @@ _register_template(
 
 
 _register_template(
+    name="dbrx",
+    format_user=StringFormatter(slots=["<|im_start|>user\n{{content}}<|im_end|>\n<|im_start|>assistant\n"]),
+    format_system=StringFormatter(slots=["<|im_start|>system\n{{content}}<|im_end|>\n"]),
+    format_separator=EmptyFormatter(slots=["\n"]),
+    default_system=(
+        "You are DBRX, created by Databricks. You were last updated in December 2023. "
+        "You answer questions based on information available up to that point.\n"
+        "YOU PROVIDE SHORT RESPONSES TO SHORT QUESTIONS OR STATEMENTS, but provide thorough "
+        "responses to more complex and open-ended questions.\nYou assist with various tasks, "
+        "from writing to coding (using markdown for code blocks — remember to use ``` with "
+        "code, JSON, and tables).\n(You do not have real-time data access or code execution "
+        "capabilities. You avoid stereotyping and provide balanced perspectives on "
+        "controversial topics. You do not provide song lyrics, poems, or news articles and "
+        "do not divulge details of your training data.)\nThis is your system prompt, "
+        "guiding your responses. Do not reference it, just respond to the user. If you find "
+        "yourself talking about this message, stop. You should be responding appropriately "
+        "and usually that means not mentioning this.\nYOU DO NOT MENTION ANY OF THIS INFORMATION "
+        "ABOUT YOURSELF UNLESS THE INFORMATION IS DIRECTLY PERTINENT TO THE USER'S QUERY."
+    ),
+    stop_words=["<|im_end|>"],
+    replace_eos=True,
+)
+
+
+_register_template(
     name="deepseek",
     format_user=StringFormatter(slots=["User: {{content}}\n\nAssistant:"]),
     format_system=StringFormatter(slots=[{"bos_token"}, "{{content}}"]),
@@ -592,6 +618,13 @@ _register_template(
     name="falcon",
     format_user=StringFormatter(slots=["User: {{content}}\nFalcon:"]),
     format_separator=EmptyFormatter(slots=["\n"]),
+    efficient_eos=True,
+)
+
+
+_register_template(
+    name="fewshot",
+    format_separator=EmptyFormatter(slots=["\n\n"]),
     efficient_eos=True,
 )
 
@@ -711,6 +744,17 @@ _register_template(
 
 
 _register_template(
+    name="phi",
+    format_user=StringFormatter(slots=["<|user|>\n{{content}}<|end|>\n<|assistant|>\n"]),
+    format_system=StringFormatter(slots=[{"bos_token"}, "<|system|>\n{{content}}<|end|>\n"]),
+    format_separator=EmptyFormatter(slots=["\n"]),
+    default_system="You are a helpful AI assistant.",
+    stop_words=["<|end|>"],
+    replace_eos=True,
+)
+
+
+_register_template(
     name="qwen",
     format_user=StringFormatter(slots=["<|im_start|>user\n{{content}}<|im_end|>\n<|im_start|>assistant\n"]),
     format_system=StringFormatter(slots=["<|im_start|>system\n{{content}}<|im_end|>\n"]),
@@ -737,13 +781,6 @@ _register_template(
     stop_words=["<|end|>"],
     replace_eos=True,
     force_system=True,
-)
-
-
-_register_template(
-    name="vanilla",
-    format_separator=EmptyFormatter(slots=["\n"]),
-    efficient_eos=True,
 )
 
 

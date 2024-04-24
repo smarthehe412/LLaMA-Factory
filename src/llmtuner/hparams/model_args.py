@@ -22,7 +22,7 @@ class ModelArguments:
         metadata={"help": "Where to store the pre-trained models downloaded from huggingface.co or modelscope.cn."},
     )
     use_fast_tokenizer: bool = field(
-        default=False,
+        default=True,
         metadata={"help": "Whether or not to use one of the fast tokenizer (backed by the tokenizers library)."},
     )
     resize_vocab: bool = field(
@@ -61,13 +61,17 @@ class ModelArguments:
         default=None,
         metadata={"help": "Which scaling strategy should be adopted for the RoPE embeddings."},
     )
-    flash_attn: bool = field(
-        default=False,
-        metadata={"help": "Enable FlashAttention-2 for faster training."},
+    flash_attn: Literal["off", "sdpa", "fa2", "auto"] = field(
+        default="auto",
+        metadata={"help": "Enable FlashAttention for faster training and inference."},
     )
     shift_attn: bool = field(
         default=False,
         metadata={"help": "Enable shift short attention (S^2-Attn) proposed by LongLoRA."},
+    )
+    mixture_of_depths: Optional[Literal["convert", "load"]] = field(
+        default=None,
+        metadata={"help": "Convert the model to mixture-of-depths (MoD) or load the MoD model."},
     )
     use_unsloth: bool = field(
         default=False,
